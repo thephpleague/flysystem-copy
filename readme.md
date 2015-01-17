@@ -12,7 +12,7 @@
 ## Installation
 
 ```bash
-composer require league\flysystem-copy
+composer require league/flysystem-copy
 ```
 
 ## Usage
