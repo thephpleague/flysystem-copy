@@ -192,18 +192,19 @@ class CopyAdapter extends AbstractAdapter
     {
         static $cache = [];
 
-        if (isset($cache[$path])) {
-            return $cache[$path];
+        $location = $this->applyPathPrefix($path);
+
+        if (isset($cache[$location])) {
+            return $cache[$location];
         }
 
-        $location = $this->applyPathPrefix($path);
         $objects = $this->client->listPath($location);
 
         if ($objects === false || isset($objects[0]) === false || empty($objects[0])) {
-            return $cache[$path] = false;
+            return $cache[$location] = false;
         }
 
-        return $cache[$path] = $this->normalizeObject($objects[0], $path);
+        return $cache[$location] = $this->normalizeObject($objects[0], $path);
     }
 
     /**
