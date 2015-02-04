@@ -190,14 +190,21 @@ class CopyAdapter extends AbstractAdapter
      */
     public function getMetadata($path)
     {
+        static $cache = [];
+
         $location = $this->applyPathPrefix($path);
+
+        if (isset($cache[$location])) {
+            return $cache[$location];
+        }
+
         $objects = $this->client->listPath($location);
 
         if ($objects === false || isset($objects[0]) === false || empty($objects[0])) {
-            return false;
+            return $cache[$location] = false;
         }
 
-        return $this->normalizeObject($objects[0], $path);
+        return $cache[$location] = $this->normalizeObject($objects[0], $path);
     }
 
     /**
