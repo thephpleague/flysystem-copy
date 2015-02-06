@@ -31,6 +31,13 @@ class CopyAdapter extends AbstractAdapter
     protected $client;
 
     /**
+     * Object meta data cache array
+     * 
+     * @var array
+     */
+    private $metaCache = [];
+
+    /**
      * Constructor.
      *
      * @param API    $client
@@ -40,6 +47,7 @@ class CopyAdapter extends AbstractAdapter
     {
         $this->client = $client;
         $this->setPathPrefix($prefix);
+        $this->metaCache = [];
     }
 
     /**
@@ -64,6 +72,8 @@ class CopyAdapter extends AbstractAdapter
         $location = $this->applyPathPrefix($path);
         $result = $this->client->uploadFromString($location, $contents);
 
+        unset($this->metaCache[$location]);
+
         return $this->normalizeObject($result, $path);
     }
 
@@ -74,6 +84,8 @@ class CopyAdapter extends AbstractAdapter
     {
         $location = $this->applyPathPrefix($path);
         $result = $this->client->uploadFromStream($location, $resource);
+
+        unset($this->metaCache[$location]);
 
         return $this->normalizeObject($result, $path);
     }
@@ -86,6 +98,8 @@ class CopyAdapter extends AbstractAdapter
         $location = $this->applyPathPrefix($path);
         $result = $this->client->uploadFromString($location, $contents);
 
+        unset($this->metaCache[$location]);
+
         return $this->normalizeObject($result, $path);
     }
 
@@ -96,6 +110,8 @@ class CopyAdapter extends AbstractAdapter
     {
         $location = $this->applyPathPrefix($path);
         $result = $this->client->uploadFromStream($location, $resource);
+
+        unset($this->metaCache[$location]);
 
         return $this->normalizeObject($result, $path);
     }
@@ -132,6 +148,8 @@ class CopyAdapter extends AbstractAdapter
             return false;
         }
 
+        unset($this->metaCache[$location], $this->metaCache[$destination]);
+
         return true;
     }
 
@@ -140,11 +158,16 @@ class CopyAdapter extends AbstractAdapter
      */
     public function copy($path, $newpath)
     {
+        $location = $this->applyPathPrefix($path);
+        $destination = $this->applyPathPrefix($newpath);
+
         try {
-            $this->client->copy($path, $newpath);
+            $this->client->copy($location, $destination);
         } catch (\Exception $e) {
             return false;
         }
+
+        unset($this->metaCache[$destination]);
 
         return true;
     }
@@ -156,6 +179,8 @@ class CopyAdapter extends AbstractAdapter
     {
         $location = $this->applyPathPrefix($path);
 
+        unset($this->metaCache[$location]);
+
         return $this->client->removeFile($location);
     }
 
@@ -165,6 +190,8 @@ class CopyAdapter extends AbstractAdapter
     public function deleteDir($path)
     {
         $location = $this->applyPathPrefix($path);
+
+        unset($this->metaCache[$location]);
 
         return $this->client->removeDir($location);
     }
@@ -182,6 +209,8 @@ class CopyAdapter extends AbstractAdapter
             return false;
         }
 
+        unset($this->metaCache[$location]);
+
         return compact('path') + ['type' => 'dir'];
     }
 
@@ -191,13 +220,25 @@ class CopyAdapter extends AbstractAdapter
     public function getMetadata($path)
     {
         $location = $this->applyPathPrefix($path);
-        $objects = $this->client->listPath($location);
 
-        if ($objects === false || isset($objects[0]) === false || empty($objects[0])) {
+        if (!empty($this->metaCache[$location])) {
+            return $this->normalizeObject($this->metaCache[$location], $location);
+        }
+        $this->metaCache[$location] = $object = $this->client->getMeta($location);
+
+        if ($object === false || empty($object)) {
             return false;
         }
 
-        return $this->normalizeObject($objects[0], $path);
+        if (!empty($object->children)) {
+            foreach($object->children as $chiled) {
+                if (!isset($this->metaCache[$chiled->path])) {
+                    $this->metaCache[$chiled->path] = $chiled;
+                }
+            }
+        }
+        
+        return $this->normalizeObject($object, $location);
     }
 
     /**
@@ -232,15 +273,21 @@ class CopyAdapter extends AbstractAdapter
         $listing = [];
         $location = $this->applyPathPrefix($dirname);
 
-        if (! $result = $this->client->listPath($location)) {
-            return [];
+        if (isset($this->metaCache[$location]) && isset($this->metaCache[$location]->children)) {
+            $object = $this->metaCache[$location];
+        } else {
+            $this->metaCache[$location] = $object = $this->client->getMeta($location);
         }
 
-        foreach ($result as $object) {
-            $listing[] = $this->normalizeObject($object, $object->path);
-
-            if ($recursive && $object->type == 'dir') {
-                $listing = array_merge($listing, $this->listContents($object->path, $recursive));
+        if (!empty($object->children)) {
+            foreach($object->children as $chiled) {
+                $listing[] = $this->normalizeObject($chiled, $chiled->path);
+                if (!isset($this->metaCache[$chiled->path])) {
+                    $this->metaCache[$chiled->path] = $chiled;
+                }
+                if ($recursive && $chiled->type == 'dir') {
+                    $listing = array_merge($listing, $this->listContents($chiled->path, $recursive));
+                }
             }
         }
 
