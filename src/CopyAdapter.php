@@ -231,9 +231,9 @@ class CopyAdapter extends AbstractAdapter
         }
 
         if (!empty($object->children)) {
-            foreach($object->children as $chiled) {
-                if (!isset($this->metaCache[$chiled->path])) {
-                    $this->metaCache[$chiled->path] = $chiled;
+            foreach($object->children as $child) {
+                if (!isset($this->metaCache[$child->path])) {
+                    $this->metaCache[$child->path] = $child;
                 }
             }
         }
@@ -280,13 +280,13 @@ class CopyAdapter extends AbstractAdapter
         }
 
         if (!empty($object->children)) {
-            foreach($object->children as $chiled) {
-                $listing[] = $this->normalizeObject($chiled, $chiled->path);
-                if (!isset($this->metaCache[$chiled->path])) {
-                    $this->metaCache[$chiled->path] = $chiled;
+            foreach($object->children as $child) {
+                $listing[] = $this->normalizeObject($child, $child->path);
+                if (!isset($this->metaCache[$child->path])) {
+                    $this->metaCache[$child->path] = $child;
                 }
-                if ($recursive && $chiled->type == 'dir') {
-                    $listing = array_merge($listing, $this->listContents($chiled->path, $recursive));
+                if ($recursive && $child->type == 'dir') {
+                    $listing = array_merge($listing, $this->listContents($child->path, $recursive));
                 }
             }
         }
