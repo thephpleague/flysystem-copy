@@ -265,7 +265,7 @@ class CopyAdapter extends AbstractAdapter
             $timestamp = strtotime($object->modified_time);
         }
 
-        $path = ltrim($path, '/');
+        $path = trim($this->removePathPrefix($path), '/');
         $result = Util::map((array) $object, static::$resultMap);
 
         return compact('timestamp', 'path') + $result;
