@@ -248,6 +248,25 @@ class CopyAdapter extends AbstractAdapter
     }
 
     /**
+     * Get item absolute URL
+     *
+     * @param string   $path
+     *
+     * @return string item absolute URL
+     */
+    public function getUrl($path)
+    {
+        $location = $this->applyPathPrefix($path);
+
+        try {
+            $object = $this->client->createLink($location);
+            return $object->url;
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
+
+    /**
      * Normalize a result from Copy.
      *
      * @param stdClass $object
