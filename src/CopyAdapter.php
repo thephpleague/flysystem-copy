@@ -259,8 +259,24 @@ class CopyAdapter extends AbstractAdapter
         $location = $this->applyPathPrefix($path);
 
         try {
-            $object = $this->client->createLink($location);
-            return $object->url;
+            $object = $this->getMetadata($path);
+            if (! isset($object->links)) {
+                $this->metaCache[$location] = $object = $this->client->getMeta($location);
+            }
+            $url = '';
+            if (! empty($object->links)) {
+                foreach($object->links as $link) {
+                    if ($link->status === 'viewed' && $link->permissions === 'read') {
+                        $url = $link->url;
+                        break;
+                    }
+                }
+            }
+            if ($url === '') {
+                $object = $this->client->createLink($location);
+                $url = $object->url;
+            }
+            return $url . '/' . rawurlencode($object->name);
         } catch (\Exception $e) {
             return '';
         }
