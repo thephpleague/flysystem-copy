@@ -64,7 +64,7 @@ class CopyAdapter extends AbstractAdapter
         $location = $this->applyPathPrefix($path);
         $result = $this->client->uploadFromString($location, $contents);
 
-        return $this->normalizeObject($result, $path);
+        return $this->normalizeObject($result, $location);
     }
 
     /**
@@ -75,7 +75,7 @@ class CopyAdapter extends AbstractAdapter
         $location = $this->applyPathPrefix($path);
         $result = $this->client->uploadFromStream($location, $resource);
 
-        return $this->normalizeObject($result, $path);
+        return $this->normalizeObject($result, $location);
     }
 
     /**
@@ -86,7 +86,7 @@ class CopyAdapter extends AbstractAdapter
         $location = $this->applyPathPrefix($path);
         $result = $this->client->uploadFromString($location, $contents);
 
-        return $this->normalizeObject($result, $path);
+        return $this->normalizeObject($result, $location);
     }
 
     /**
@@ -97,7 +97,7 @@ class CopyAdapter extends AbstractAdapter
         $location = $this->applyPathPrefix($path);
         $result = $this->client->uploadFromStream($location, $resource);
 
-        return $this->normalizeObject($result, $path);
+        return $this->normalizeObject($result, $location);
     }
 
     /**
@@ -197,7 +197,7 @@ class CopyAdapter extends AbstractAdapter
             return false;
         }
 
-        return $this->normalizeObject($objects[0], $path);
+        return $this->normalizeObject($objects[0], $location);
     }
 
     /**
