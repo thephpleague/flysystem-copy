@@ -74,7 +74,7 @@ class CopyAdapter extends AbstractAdapter
 
         unset($this->metaCache[$location]);
 
-        return $this->normalizeObject($result, $path);
+        return $this->normalizeObject($result, $location);
     }
 
     /**
@@ -87,7 +87,7 @@ class CopyAdapter extends AbstractAdapter
 
         unset($this->metaCache[$location]);
 
-        return $this->normalizeObject($result, $path);
+        return $this->normalizeObject($result, $location);
     }
 
     /**
@@ -100,7 +100,7 @@ class CopyAdapter extends AbstractAdapter
 
         unset($this->metaCache[$location]);
 
-        return $this->normalizeObject($result, $path);
+        return $this->normalizeObject($result, $location);
     }
 
     /**
@@ -113,7 +113,7 @@ class CopyAdapter extends AbstractAdapter
 
         unset($this->metaCache[$location]);
 
-        return $this->normalizeObject($result, $path);
+        return $this->normalizeObject($result, $location);
     }
 
     /**
@@ -312,7 +312,7 @@ class CopyAdapter extends AbstractAdapter
             $timestamp = strtotime($object->modified_time);
         }
 
-        $path = ltrim($path, '/');
+        $path = trim($this->removePathPrefix($path), '/');
         $result = Util::map((array) $object, static::$resultMap);
 
         return compact('timestamp', 'path') + $result;
