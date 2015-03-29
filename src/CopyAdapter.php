@@ -263,7 +263,7 @@ class CopyAdapter extends AbstractAdapter
         }
 
         if (isset($object->modified_time)) {
-            $timestamp = strtotime($object->modified_time);
+            $timestamp = $object->modified_time;
         }
 
         $path = trim($this->removePathPrefix($path), '/');
