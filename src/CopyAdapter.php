@@ -259,7 +259,7 @@ class CopyAdapter extends AbstractAdapter
      */
     protected function normalizeObject($object, $path)
     {
-        if (is_a($object, 'stdClass') === false) {
+        if (!$object instanceof stdClass) {
             return false;
         }
 
