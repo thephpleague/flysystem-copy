@@ -7,6 +7,7 @@ use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\Adapter\Polyfill\NotSupportingVisibilityTrait;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
+use stdClass;
 
 class CopyAdapter extends AbstractAdapter
 {
