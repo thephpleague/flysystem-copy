@@ -42,6 +42,16 @@ class CopyAdapter extends AbstractAdapter
         $this->client = $client;
         $this->setPathPrefix($prefix);
     }
+    
+    /**
+     * Get the Copy API instance.
+     *
+     * @return API
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
 
     /**
      * Check weather a file exists.
