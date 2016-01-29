@@ -248,11 +248,14 @@ class CopyAdapter extends AbstractAdapter
             return [];
         }
 
+        $location = rtrim($location, '/');
         foreach ($result as $object) {
-            $listing[] = $this->normalizeObject($object, $object->path);
+            if ($location !== $object->path) {
+                $listing[] = $this->normalizeObject($object, $object->path);
 
-            if ($recursive && $object->type == 'dir') {
-                $listing = array_merge($listing, $this->listContents($object->path, $recursive));
+                if ($recursive && $object->type == 'dir') {
+                    $listing = array_merge($listing, $this->listContents($object->path, $recursive));
+                }
             }
         }
 
