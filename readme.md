@@ -1,3 +1,10 @@
+# DISCONTINUED
+
+### See the following issue: https://github.com/thephpleague/flysystem-copy/issues/16
+
+
+----------
+
 # Flysystem Adapter for Copy.com
 
 [![Author](http://img.shields.io/badge/author-@frankdejonge-blue.svg?style=flat-square)](https://twitter.com/frankdejonge)
