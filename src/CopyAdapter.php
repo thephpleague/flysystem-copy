@@ -260,6 +260,41 @@ class CopyAdapter extends AbstractAdapter
     }
 
     /**
+     * Get item absolute URL
+     *
+     * @param string   $path
+     *
+     * @return string item absolute URL
+     */
+    public function getUrl($path)
+    {
+        $location = $this->applyPathPrefix($path);
+
+        try {
+            $object = $this->getMetadata($path);
+            if (! isset($object->links)) {
+                $this->metaCache[$location] = $object = $this->client->getMeta($location);
+            }
+            $url = '';
+            if (! empty($object->links)) {
+                foreach($object->links as $link) {
+                    if ($link->status === 'viewed' && $link->permissions === 'read') {
+                        $url = $link->url;
+                        break;
+                    }
+                }
+            }
+            if ($url === '') {
+                $object = $this->client->createLink($location);
+                $url = $object->url;
+            }
+            return $url . '/' . rawurlencode($object->name);
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
+
+    /**
      * Normalize a result from Copy.
      *
      * @param stdClass $object
